@@ -1,75 +1,171 @@
-""""""""""""""""""""
-" display 
-""""""""""""""""""""
+syntax enable
 
-set nu!                        "显示行号
-"set ai!                        "设置自动缩进
-set tabstop=4                  "设置tab宽度
-"set cindent shiftwidth=4      "自动缩进4空格
-"set smartindent               "智能自动缩进
-set showmatch                  "显示括号匹配
-"set mouse=a                   "启动鼠标
-set ruler                      "右下角状态行
-set hlsearch                   "搜索高亮显示
-set matchtime=1                "搜索不区分大小写
-"set cursorline                "当前行增加横线
-set list                       "显示Tab符
-set listchars=tab:\|\ ,
+"let g:solarized_termtrans = 1
+"set background=dark
+"colorscheme solarized
+"let g:solarized_termcolors=256
 
-syntax enable                  "语法高亮
-syntax on                      "打开文件类型检测
+set background=dark
+let g:hybrid_custom_term_colors = 1
+let g:hybrid_reduced_contrast = 1 " Remove this line if using the default palette.
+colorscheme hybrid
 
-"set cursorcolumn  
-"hi CursorColumn guibg=Grey40 guifg=red term=BOLD 
-autocmd InsertLeave * se nocul "编辑加横线"
-autocmd InsertEnter * se cul
+"colorscheme molokai
+"let g:rehash256 = 1
 
-set fenc=utf-8                 "设置编码
-set encoding=utf-8
-set fileencodings=utf-8,gbk,cp936,latin-1"
+"set background=light
+"colorscheme PaperColor
+"
 
-set foldenable                 "打开折叠
-set foldmethod=manual          "手动折叠
+"set rtp+=/usr/local/lib/python2.7/site-packages/powerline/bindings/vim/
+set laststatus=2
+set t_Co=256
 
-set completeopt=preview,menu   "auto complate
+" 按键映射
+map <Esc>OP <F1>
+map <Esc>OQ <F2>
+map <Esc>OR <F3>
+map <Esc>OS <F4>
+map <Esc>[16~ <F5>
+map <Esc>[17~ <F6>
+map <Esc>[18~ <F7>
+map <Esc>[19~ <F8>
+map <Esc>[20~ <F9>
+map <Esc>[21~ <F10>
+map <Esc>[23~ <F11>
+map <Esc>[24~ <F12>
 
-set enc=utf-8
-set fencs=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936
-set langmenu=zh_CN.UTF-8
-set helplang=cn
+set backspace=indent,eol,start
+" 不设定在插入状态无法用退格键和 Delete 键删除回车符
 
-""""""""""""""
-" usefull set
-""""""""""""""
+"""""""
+" 缩进
+"""""""
+" 自动缩进
+set autoindent
+set cindent
+" Tab键的宽度
+set tabstop=4
+" 统一缩进为4
+set softtabstop=4
+set shiftwidth=4
+" 空格代替制表符
+set expandtab
 
-" 符号自动补全
-"":inoremap ( ()<ESC>i
-"":inoremap ) <c-r>=ClosePair(')')<CR>
-"":inoremap { {<CR>}<ESC>O
-"":inoremap } <c-r>=ClosePair('}')<CR>
-"":inoremap [ []<ESC>i
-"":inoremap ] <c-r>=ClosePair(']')<CR>
-"":inoremap " ""<ESC>i
-"":inoremap ' ''<ESC>i
+"""""""
+" 显示
+""""""
+" 显示行号
+set number
+" 查找高亮
+set hlsearch
+" 高亮显示匹配的括号
+set showmatch
+" 显示位置指示器
+set ruler
+" 显示竖线 和 横线
+set cursorcolumn
+set cursorline
 
-" 自动增加文件头
-autocmd BufNewFile *.sh,*.cpp,*.py exec ":call SetTitle()" 
-func SetTitle() 
-    if &filetype == 'sh' 
-        call append(0, "\#!/bin/bash") 
-    endif
-    if &filetype == 'cpp'
-        call append(0, "#include <iostream>")
-        call append(line("."), "using namespace std;")
-        call append(line(".")+1, "")
-        call append(line(".")+2, "int main(int argc, char** argv)")
-        call append(line(".")+3, "\{")
-        call append(line(".")+4, "    return 0;")
-        call append(line(".")+5, "\}")
-    endif
-    if &filetype == 'py'
-        call append(0, "\#!/usr/bin/env python")
-    endif
-    " move to end line 
-    autocmd BufNewFile * normal G
-endfunc 
+
+" 插件管理器
+execute pathogen#infect()
+syntax on
+filetype plugin indent on
+
+" 目录结构NERDTREE
+map <F2> :NERDTreeToggle<CR>
+"let NERDTreeWinPos="right"
+"autocmd vimenter * NERDTree
+
+" TAGBAR
+nmap <F3> :TagbarToggle<CR>
+autocmd VimEnter * Tagbar
+
+" 宽度限制
+augroup vimrc_autocmds
+    autocmd!
+    " highlight characters past column 80
+    autocmd FileType python highlight Excess ctermbg=DarkGrey guibg=Black
+    autocmd FileType python match Excess /\%80v.*/
+    autocmd FileType python set nowrap
+augroup END
+
+" 记录上次位置
+autocmd BufReadPost *
+            \ if line("'\"")>0&&line("'\"")<=line("$") |
+            \   exe "normal g'\"" |
+            \ endif
+
+set guifont=Inconsolata\ for\ Powerline:h14
+set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
+
+
+" next or pre page
+map <tab> :tabp<CR>
+map <SPACE> :
+
+" ag文件内容搜索
+set runtimepath^=~/.vim/bundle/ag.vim
+nnoremap \ :Ag<SPACE>
+
+" ctrlp最近使用的文件
+set runtimepath^=~/.vim/bundle/ctrlp.vim
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlPMixed'
+let g:ctrlp_custom_ignore = {
+    \ 'dir':  '\v[\/]\.(git|hg|svn|rvm)$',
+    \ 'file': '\v\.(exe|so|dll|zip|tar|tar.gz|pyc)$',
+    \ }
+
+" 自动补全
+" https://github.com/Valloric/YouCompleteMe
+nnoremap gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
+
+" 括号自动补全
+" https://github.com/Raimondi/delimitMate.git
+
+" air-line状态栏
+let g:airline_powerline_fonts = 1
+"let g:airline_theme = "papercolor"
+
+set mouse=a
+
+" 括号高亮
+" https://github.com/kien/rainbow_parentheses.vim
+au VimEnter * RainbowParenthesesToggle
+au Syntax * RainbowParenthesesLoadRound
+au Syntax * RainbowParenthesesLoadSquare
+au Syntax * RainbowParenthesesLoadBraces
+
+" tagbar for golang
+let g:tagbar_type_go = {
+    \ 'ctagstype' : 'go',
+    \ 'kinds'     : [
+        \ 'p:package',
+        \ 'i:imports:1',
+        \ 'c:constants',
+        \ 'v:variables',
+        \ 't:types',
+        \ 'n:interfaces',
+        \ 'w:fields',
+        \ 'e:embedded',
+        \ 'm:methods',
+        \ 'r:constructor',
+        \ 'f:functions'
+        \ ],
+    \ 'sro' : '.',
+    \ 'kind2scope' : {
+        \ 't' : 'ctype',
+        \ 'n' : 'ntype'
+    \ },
+            \ 'scope2kind' : {
+        \ 'ctype' : 't',
+        \ 'ntype' : 'n'
+    \},
+    \ 'ctagsbin'  : 'gotags',
+    \ 'ctagsargs' : '-sort -silent'
+    \}
+
+" godef go跳转
+let g:godef_split=0
